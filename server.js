@@ -1,30 +1,22 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const fs = require('fs');
 const app = express();
-let stringifyFile;
 const port = 3000;
+app.use(express.static('assets'));
 
-app.use(bodyParser.json());
-app.get('/getNote', (req, res) => {
-  fs.readFile('./test.json', 'utf-8', (err, data) => {
-    if (err) throw err;
-    stringifyFile = data;
-    res.send(data);
-  })
+app.get('/', (req,res) => {
+  res.sendFile('/index.html');
 });
 
-app.post('/updateNote/:note', (req, res) => {
-  let myData = JSON.parse(stringifyFile);
-  myData.listOfItems.push(req.params.note);
-  const dataToWrite = JSON.stringify(myData);
-  
-  fs.writeFile('./test.json', dataToWrite, (err) => {
-    if (err) throw err;
-    console.log('File updated');
-    res.send(dataToWrite);
-  });
+app.get('/userform', (req, res) => {
+  const response = {
+    first_name: req.query.first_name,
+    last_name: req.query.last_name
+  };
+  res.end(JSON.stringify(response));
 });
 
-const server = app.listen(port);
-
+const server = app.listen(port,'localhost', () => {
+  const host = server.address().address;
+  const port = server.address().port;
+  console.log(`Przykladowa aplikacja nasluchuje na http://${host}:${port}`);
+});
